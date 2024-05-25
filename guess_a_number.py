@@ -1,6 +1,7 @@
 from random import randint
 computer_number = randint(1, 100)
-while True:
+guess = 0
+while guess != 6:
     player = input('Guess a number from 1 to 100: ')
     if not player.isdigit():
         print('Invalid input. Try again!')
@@ -13,3 +14,6 @@ while True:
         print('Your number is too high!')
     else:
         print('Your number is too low!')
+    guess += 1
+else:
+    print('You\'ve passed your limits.')
