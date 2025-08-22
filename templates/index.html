@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Number Guesser Game</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+</head>
+<body>
+    <div class="game-container">
+        <h1>Guess the Number!</h1>
+
+        {% if message %}
+            <div class="message">
+                {{ message }}
+            </div>
+        {% endif %}
+
+        {% if score_message %}
+            <p class="score-message">{{ score_message }}</p>
+            <div class="play-again">
+                <a href="{% url 'play' %}?reset=true">Play Another Game</a>
+            </div>
+        {% elif player_won == False and guess_count >= 6 %}
+            <div class="play-again">
+                <a href="{% url 'play' %}?reset=true">Start New Game</a>
+            </div>
+        {% else %}
+            <form method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <button type="submit">Submit Guess</button>
+            </form>
+            <p class="guess-counter">Guesses made: {{ guess_count }} / 6</p>
+        {% endif %}
+    </div>
+</body>
+</html>

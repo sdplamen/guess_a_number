@@ -1,0 +1,94 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap');
+body {
+    font-family: Montserrat, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background-color: #0f3763;
+    margin: 0;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+
+}
+.game-container {
+    background-color: #0f3763;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+h1 {
+    color: #ffffcc;
+    margin-bottom: 20px;
+}
+.message {
+    margin: 20px 0;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 1.1em;
+    background-color: #08458f;
+    color: #ede38f;
+}
+.score-message {
+    background-color: #0095af;
+    color: #155724;
+    font-weight: bold;
+}
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+}
+label {
+    font-weight: bold;
+    color: #ede38f;
+    display: block;
+    margin-bottom: 5px;
+}
+input[type="number"] {
+    background-color: #08458f;
+    padding: 10px;
+    border: 1px solid #fafa7a;
+    border-radius: 5px;
+    font-size: 1em;
+    width: calc(100% - 22px);
+    color: #ede38f;
+}
+button {
+    background-color: #08458f;
+    color: #f7f8d9;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+button:hover {
+    background-color: #001535;
+}
+.play-again {
+    margin-top: 20px;
+}
+.play-again a {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 1em;
+    transition: background-color 0.3s ease;
+}
+.play-again a:hover {
+    background-color: #218838;
+}
+.guess-counter {
+    margin-top: 15px;
+    color: #ede38f;
+    font-size: 0.9em;
+}
