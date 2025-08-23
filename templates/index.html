@@ -9,31 +9,61 @@
 </head>
 <body>
     <div class="game-container">
-        <h1>Guess the Number!</h1>
-
-        {% if message %}
-            <div class="message">
-                {{ message }}
-            </div>
-        {% endif %}
-
+        <h1>Guess a Number (1-100)</h1>
+        <p class="message
+            {% if 'too high' in message %}too-high
+            {% elif 'too low' in message %}too-low
+            {% elif 'guessed it' in message %}win
+            {% elif 'limits' in message %}error
+            {% else %}welcome{% endif %}">
+            {{ message }}
+        </p>
         {% if score_message %}
-            <p class="score-message">{{ score_message }}</p>
-            <div class="play-again">
-                <a href="{% url 'play' %}?reset=true">Play Another Game</a>
-            </div>
-        {% elif player_won == False and guess_count >= 6 %}
-            <div class="play-again">
-                <a href="{% url 'play' %}?reset=true">Start New Game</a>
-            </div>
-        {% else %}
-            <form method="post">
-                {% csrf_token %}
-                {{ form.as_p }}
-                <button type="submit">Submit Guess</button>
-            </form>
-            <p class="guess-counter">Guesses made: {{ guess_count }} / 6</p>
+            <p class="game-over">{{ score_message }}</p>
         {% endif %}
+        <p class="message">Guesses made: {{ guess_count }}</p>
+        <form method="post">
+            {% csrf_token %}
+            {% if not game_over %}
+                {{ form.player_guess.label_tag }} {{ form.player_guess }}
+                {% if form.player_guess.errors %}
+                    <p class="error">{{ form.player_guess.errors }}</p>
+                {% endif %}
+            {% else %}
+                {{ form.play_again.label_tag }} {{ form.play_again }}
+                {% if form.play_again.errors %}
+                    <p class="error">{{ form.play_again.errors }}</p>
+                {% endif %}
+            {% endif %}
+            <input type="submit" value="{% if game_over %}Play Again?{% else %}Submit Guess{% endif %}">
+        </form>
     </div>
+<!--    <div class="game-container">-->
+<!--        <h1>Guess the Number!</h1>-->
+
+<!--        {% if message %}-->
+<!--            <div class="message">-->
+<!--                {{ message }}-->
+<!--            </div>-->
+<!--        {% endif %}-->
+
+<!--        {% if score_message %}-->
+<!--            <p class="score-message">{{ score_message }}</p>-->
+<!--            <div class="play-again">-->
+<!--                <a href="{% url 'play' %}?reset=true">Play Another Game</a>-->
+<!--            </div>-->
+<!--        {% elif player_won == False and guess_count >= 6 %}-->
+<!--            <div class="play-again">-->
+<!--                <a href="{% url 'play' %}?reset=true">Start New Game</a>-->
+<!--            </div>-->
+<!--        {% else %}-->
+<!--            <form method="post">-->
+<!--                {% csrf_token %}-->
+<!--                {{ form.as_p }}-->
+<!--                <button type="submit">Submit Guess</button>-->
+<!--            </form>-->
+<!--            <p class="guess-counter">Guesses made: {{ guess_count }} / 6</p>-->
+<!--        {% endif %}-->
+<!--    </div>-->
 </body>
 </html>

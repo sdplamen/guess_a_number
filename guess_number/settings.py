@@ -36,6 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'drf_spectacular',
 ] + PROJECT_APPS
 
 MIDDLEWARE = [
@@ -47,6 +49,23 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Number Guesser Game API',
+    'DESCRIPTION': 'API for the classic number guessing game.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
 
 ROOT_URLCONF = 'guess_number.urls'
 
@@ -117,6 +136,17 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
+
+SWAGGER_SETTINGS = {
+    'USE_SESSION_AUTH': False,
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    },
+}
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
