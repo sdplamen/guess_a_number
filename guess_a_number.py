@@ -2,7 +2,10 @@ from random import randint
 computer_number = randint(1, 100)
 guess = 0
 while guess != 6:
-    player = input()
+    if guess is not None:
+        player = guess
+    else:
+        player = input('Guess a number from 1 to 100: ')
     if not player.isdigit():
         print('Invalid input. Try again!')
         continue
