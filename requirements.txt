@@ -2,7 +2,6 @@ asgiref==3.9.1
 attrs==25.3.0
 Django==5.2.1
 djangorestframework==3.16.1
-dotenv==0.9.9
 drf-spectacular==0.28.0
 gunicorn==23.0.0
 inflection==0.5.1
