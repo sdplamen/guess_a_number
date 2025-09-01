@@ -5,7 +5,6 @@ from drf_spectacular.utils import OpenApiExample, extend_schema
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
 from game.forms import GuessForm
 from game.serializers import GameStateSerializer, PlayAgainSerializer, GuessInputSerializer
 
@@ -33,6 +32,13 @@ class GameView(View):
         return render(request, self.template_name, context)
 
     def post(self, request):
+        if 'computer_number' not in request.session:
+            request.session['computer_number'] = randint(1, 100)
+            request.session['guess_count'] = 0
+            request.session['message'] = "Welcome! Try to guess the number."
+            request.session['score_message'] = None
+            request.session['game_over'] = False
+
         form = GuessForm(request.POST)
         computer_number = request.session.get('computer_number')
         guess_count = request.session.get('guess_count', 0)
@@ -99,46 +105,45 @@ class GameView(View):
         return render(request, self.template_name, context)
 
 
-
-class GameAPIView(APIView) :
+class GameAPIView(APIView):
     @extend_schema(
         summary="Get Current Game State",
         description="Retrieves the current state of the number guessing game.",
-        responses={200 :GameStateSerializer},
+        responses={200: GameStateSerializer},
         examples=[
             OpenApiExample(
                 'Initial Game State',
                 value={
-                    'message' :'Welcome! Try to guess the number.',
-                    'score_message' :None,
-                    'guess_count' :0,
-                    'game_over' :False
+                    'message': 'Welcome! Try to guess the number.',
+                    'score_message': None,
+                    'guess_count': 0,
+                    'game_over': False
                 },
                 response_only=True
             ),
             OpenApiExample(
                 'Game State - In Progress',
                 value={
-                    'message' :'Your number is too high!',
-                    'score_message' :None,
-                    'guess_count' :2,
-                    'game_over' :False
+                    'message': 'Your number is too high!',
+                    'score_message': None,
+                    'guess_count': 2,
+                    'game_over': False
                 },
                 response_only=True
             ),
             OpenApiExample(
                 'Game State - Game Over (Win)',
                 value={
-                    'message' :'You guessed it! The number was 50.',
-                    'score_message' :'You win with a perfect score of 80!',
-                    'guess_count' :2,
-                    'game_over' :True
+                    'message': 'You guessed it! The number was 50.',
+                    'score_message': 'You win with a perfect score of 80!',
+                    'guess_count': 2,
+                    'game_over': True
                 },
                 response_only=True
             ),
         ]
     )
-    def get(self, request) :
+    def get(self, request):
         if 'computer_number' not in request.session :
             request.session['computer_number'] = randint(1, 100)
             request.session['guess_count'] = 0
@@ -147,10 +152,10 @@ class GameAPIView(APIView) :
             request.session['game_over'] = False
 
         game_state = {
-            'message' :request.session.get('message'),
-            'score_message' :request.session.get('score_message'),
-            'guess_count' :request.session.get('guess_count'),
-            'game_over' :request.session.get('game_over'),
+            'message': request.session.get('message'),
+            'score_message': request.session.get('score_message'),
+            'guess_count': request.session.get('guess_count'),
+            'game_over': request.session.get('game_over'),
         }
         serializer = GameStateSerializer(game_state)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -159,8 +164,8 @@ class GameAPIView(APIView) :
         summary="Submit a Guess or Play Again",
         description="Allows the player to submit a number guess or choose to play again after a game is over.",
         request={
-            'application/json' :GuessInputSerializer,
-            'application/json' :PlayAgainSerializer
+            'application/json': GuessInputSerializer,
+            'application/json': PlayAgainSerializer
         },
         responses={
             200: GameStateSerializer,
@@ -169,31 +174,31 @@ class GameAPIView(APIView) :
         examples=[
             OpenApiExample(
                 'Submit a Guess',
-                value={'player_guess' :50},
+                value={'player_guess': 50},
                 request_only=True,
                 description='Submit a number guess while the game is active.'
             ),
             OpenApiExample(
                 'Play Again (Yes)',
-                value={'play_again' :'y'},
+                value={'play_again': 'y'},
                 request_only=True,
                 description='Choose to play again after the game is over.'
             ),
             OpenApiExample(
                 'Play Again (No)',
-                value={'play_again' :'n'},
+                value={'play_again': 'n'},
                 request_only=True,
                 description='Choose not to play again after the game is over. This will clear the session.'
             ),
             OpenApiExample(
                 'Invalid Guess Input',
-                value={'player_guess' :101},
+                value={'player_guess': 101},
                 request_only=True,
                 description='Example of an invalid guess input (out of range).'
             )
         ]
     )
-    def post(self, request) :
+    def post(self, request):
         guess_serializer = GuessInputSerializer(data=request.data)
         play_again_serializer = PlayAgainSerializer(data=request.data)
 
@@ -203,7 +208,7 @@ class GameAPIView(APIView) :
 
         if play_again_serializer.is_valid() and 'play_again' in play_again_serializer.validated_data:
             play_again = play_again_serializer.validated_data['play_again']
-            if play_again == 'y' :
+            if play_again == 'y':
                 request.session['computer_number'] = randint(1, 100)
                 request.session['guess_count'] = 0
                 request.session['message'] = 'Welcome! Try to guess the number.'
@@ -216,15 +221,15 @@ class GameAPIView(APIView) :
                 request.session['score_message'] = None
 
             game_state = {
-                'message' :request.session.get('message'),
-                'score_message' :request.session.get('score_message'),
-                'guess_count' :request.session.get('guess_count'),
-                'game_over' :request.session.get('game_over'),
+                'message': request.session.get('message'),
+                'score_message': request.session.get('score_message'),
+                'guess_count': request.session.get('guess_count'),
+                'game_over': request.session.get('game_over'),
             }
             return Response(GameStateSerializer(game_state).data, status=status.HTTP_200_OK)
 
         if not game_over:
-            if guess_serializer.is_valid() and 'player_guess' in guess_serializer.validated_data :
+            if guess_serializer.is_valid() and 'player_guess' in guess_serializer.validated_data:
                 player_guess = guess_serializer.validated_data['player_guess']
 
                 guess_count += 1
@@ -235,15 +240,15 @@ class GameAPIView(APIView) :
                 if player_guess == computer_number:
                     request.session['game_over'] = True
                     message = f'You guessed it! The number was {computer_number}.'
-                    if guess_count == 1 :
+                    if guess_count == 1:
                         score_message = 'You win with an excellent score of 100!'
-                    elif guess_count == 2 :
+                    elif guess_count == 2:
                         score_message = 'You win with a perfect score of 80!'
-                    elif guess_count == 3 :
+                    elif guess_count == 3:
                         score_message = 'You win with a good score of 60!'
-                    elif guess_count == 4 :
+                    elif guess_count == 4:
                         score_message = 'You win with a satisfying score of 40!'
-                    elif guess_count == 5 :
+                    elif guess_count == 5:
                         score_message = 'You win with an average score of 20!'
                     else:
                         score_message = 'You win with a score of 10!'
@@ -252,7 +257,7 @@ class GameAPIView(APIView) :
                 else:
                     message = 'Your number is too low!'
 
-                if guess_count >= 6 and not request.session.get('game_over') :
+                if guess_count >= 6 and not request.session.get('game_over'):
                     message = f"You've passed your limits. The number was {computer_number}."
                     request.session['game_over'] = True
                     request.session['score_message'] = None
@@ -262,9 +267,9 @@ class GameAPIView(APIView) :
 
                 game_state = {
                     'message' :request.session.get('message'),
-                    'score_message' :request.session.get('score_message'),
-                    'guess_count' :request.session.get('guess_count'),
-                    'game_over' :request.session.get('game_over'),
+                    'score_message': request.session.get('score_message'),
+                    'guess_count': request.session.get('guess_count'),
+                    'game_over': request.session.get('game_over'),
                 }
                 return Response(GameStateSerializer(game_state).data, status=status.HTTP_200_OK)
             else:
@@ -274,9 +279,9 @@ class GameAPIView(APIView) :
                 )
         else:
             game_state = {
-                'message' :request.session.get('message', "Game over. Please choose to play again or restart."),
-                'score_message' :request.session.get('score_message'),
-                'guess_count' :request.session.get('guess_count'),
-                'game_over' :request.session.get('game_over'),
+                'message': request.session.get('message', "Game over. Please choose to play again or restart."),
+                'score_message': request.session.get('score_message'),
+                'guess_count': request.session.get('guess_count'),
+                'game_over': request.session.get('game_over'),
             }
             return Response(GameStateSerializer(game_state).data, status=status.HTTP_200_OK)
